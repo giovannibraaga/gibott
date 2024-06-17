@@ -1,8 +1,9 @@
 import { Command } from "#base";
 import {
-  ApplicationCommandOptionType,
   ApplicationCommandType,
+  ApplicationCommandOptionType,
   ChatInputCommandInteraction,
+  EmbedBuilder,
 } from "discord.js";
 import axios from "axios";
 import dotenv from "dotenv";
@@ -11,66 +12,66 @@ dotenv.config();
 
 new Command({
   name: "weather",
-  description:
-    "This command will show you the weather of the location you mention",
+  description: "Mostra o clima da localização especificada.",
   type: ApplicationCommandType.ChatInput,
   options: [
     {
       name: "location",
       type: ApplicationCommandOptionType.String,
-      description: "The location you want the weather for",
+      description: "A localização que você deseja.",
       required: true,
     },
   ],
   async run(interaction: ChatInputCommandInteraction) {
     const location = interaction.options.getString("location");
     const token = process.env.WEATHER_TOKEN;
+
     const url = `https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${token}&units=metric`;
 
     try {
-      await axios.get(url);
-      const weather = response.data;
+      const response = await axios.get(url);
+      const weatherData = response.data;
 
-      const embed = newEmbedBuilder()
-        .setColor(0x1e90ff)
-        .setTitle(`Weather in ${weather.name}`)
+      if (weatherData.cod !== 200) {
+        return interaction.reply(`Error: ${weatherData.message}`);
+      }
+
+      const weatherEmbed = new EmbedBuilder()
+        .setColor("#0A253E")
+        .setTitle(`Weather in ${weatherData.name}`)
+        .setDescription(weatherData.weather[0].description)
+        .setThumbnail(
+          `http://openweathermap.org/img/wn/${weatherData.weather[0].icon}@2x.png`
+        )
         .addFields(
           {
             name: "Temperature",
-            value: `${weather.main.temp}°C`,
+            value: `${weatherData.main.temp}°C`,
             inline: true,
           },
           {
             name: "Feels Like",
-            value: `${weather.main.feels_like}°C`,
-            inline: true,
-          },
-          {
-            name: "Weather",
-            value: weather.weather[0].description,
+            value: `${weatherData.main.feels_like}°C`,
             inline: true,
           },
           {
             name: "Humidity",
-            value: `${weather.main.humidity}%`,
+            value: `${weatherData.main.humidity}%`,
             inline: true,
           },
           {
-            name: "Wind Speed",
-            value: `${weather.wind.speed} m/s`,
+            name: "Wind",
+            value: `${weatherData.wind.speed} kph`,
             inline: true,
           }
-        )
-        .setFooter({ text: `Requested by ${interaction.user.username}` })
-        .setTimestamp(new Date());
+        );
 
-      await interaction.reply({ embeds: [embed] });
+      await interaction.reply({ embeds: [weatherEmbed] });
     } catch (error) {
-      console.log("Error fetching weather data: ", error);
+      console.error(error);
       await interaction.reply(
-        "Sorry, I couldn't fetch the weather for that location."
+        "Desculpe, não consegui buscar a localização informada."
       );
     }
   },
 });
-
