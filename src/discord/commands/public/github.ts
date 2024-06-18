@@ -103,7 +103,7 @@ new Command({
           : "No commits yet";
 
       const githubEmbed = new EmbedBuilder()
-        .setTitle(`Informações do perfil de ${profile}`)
+        .setTitle(` ${profile}'s GitHub profile`)
         .setColor("#0A253E")
         .setThumbnail(response.data.avatar_url)
         .addFields(
@@ -113,7 +113,7 @@ new Command({
             inline: true,
           },
           {
-            name: `Commits number in ${currentMonth}`,
+            name: `Commits in ${currentMonth}`,
             value: commits.data.length.toString(),
             inline: true,
           },
@@ -128,7 +128,7 @@ new Command({
             inline: true,
           },
           {
-            name: "GitHub profile url",
+            name: "Profile url",
             value: response.data.html_url,
             inline: true,
           }
@@ -136,6 +136,7 @@ new Command({
 
       await interaction.reply({ embeds: [githubEmbed] });
     } catch (error) {
+      console.error(error);
       await interaction.reply("Error: User not found.");
     }
   },
