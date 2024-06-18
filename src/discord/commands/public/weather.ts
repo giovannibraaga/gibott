@@ -68,7 +68,6 @@ new Command({
 
       await interaction.reply({ embeds: [weatherEmbed] });
     } catch (error) {
-      console.error(error);
       await interaction.reply(
         "Desculpe, não consegui buscar a localização informada."
       );
