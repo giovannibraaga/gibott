@@ -12,13 +12,13 @@ dotenv.config();
 
 new Command({
   name: "news",
-  description: "Irá mostrar as 2 últimas notícias o que for pesquisado.",
+  description: "Search for news",
   type: ApplicationCommandType.ChatInput,
   options: [
     {
       name: "search",
       type: ApplicationCommandOptionType.String,
-      description: "Insira o que deseja pesquisar.",
+      description: "What you want to search for",
       required: true,
     },
   ],
@@ -33,7 +33,7 @@ new Command({
       const newsData = response.data;
 
       if (!newsData.articles || newsData.articles.length === 0) {
-        return interaction.reply("Desculpe, não temos noticias sobre esse assunto no nosso banco de dados.");
+        return interaction.reply("Error: No articles found.");
       }
 
       const articlesToShow = newsData.articles.slice(-2);
@@ -53,7 +53,7 @@ new Command({
 
       await interaction.reply({ embeds: [newsEmbed] });
     } catch (error) {
-      await interaction.reply("Desculpe, houve um erro ao buscar pelas notícias.");
+      await interaction.reply("Error: Failed to fetch news.");
     }
   },
 });

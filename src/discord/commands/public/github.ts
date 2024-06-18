@@ -12,12 +12,12 @@ dotenv.config();
 
 new Command({
   name: "github",
-  description: "Busca informações do perfil no GitHub",
+  description: "Search for GitHub profile",
   type: ApplicationCommandType.ChatInput,
   options: [
     {
       name: "user",
-      description: "Usuário do GitHub",
+      description: "Github username",
       type: ApplicationCommandOptionType.String,
       required: true,
     },
@@ -32,14 +32,14 @@ new Command({
 
     if (!token) {
       return interaction.reply({
-        content: "Erro: Nenhum token de autenticação foi encontrado.",
+        content: "Error: No token provided. Please, provide a token.",
         ephemeral: true,
       });
     }
 
     if (!profile) {
       return interaction.reply({
-        content: "Erro: Você deve inserir um nome de usúario do github.",
+        content: "Error: No username provided. Please, provide an username.",
         ephemeral: true,
       });
     }
@@ -70,37 +70,37 @@ new Command({
 
       const currentDate = new Date();
       const monthNames = [
-        "Janeiro",
-        "Fevereiro",
-        "Março",
-        "Abril",
-        "Maio",
-        "Junho",
-        "Julho",
-        "Agosto",
-        "Setembro",
-        "Outubro",
-        "Novembro",
-        "Dezembro",
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
       ];
       const currentMonth = monthNames[currentDate.getMonth()];
 
       const accountCreationDate = new Date(
         response.data.created_at
-      ).toLocaleDateString("pt-BR", {
-        year: "numeric",
-        month: "long",
+      ).toLocaleDateString("en", {
         day: "numeric",
+        month: "long",
+        year: "numeric",
       });
 
       const lastCommitDate =
         lastCommitData.length > 0
-          ? new Date(lastCommitData[0].created_at).toLocaleDateString("pt-BR", {
-              year: "numeric",
-              month: "long",
+          ? new Date(lastCommitData[0].created_at).toLocaleDateString("en", {
               day: "numeric",
+              month: "long",
+              year: "numeric",
             })
-          : "Nenhum commit";
+          : "No commits yet";
 
       const githubEmbed = new EmbedBuilder()
         .setTitle(`Informações do perfil de ${profile}`)
@@ -108,27 +108,27 @@ new Command({
         .setThumbnail(response.data.avatar_url)
         .addFields(
           {
-            name: "Repositórios",
+            name: "Total repositories",
             value: repositories.data.length.toString(),
             inline: true,
           },
           {
-            name: `Commits no mês de ${currentMonth}`,
+            name: `Commits number in ${currentMonth}`,
             value: commits.data.length.toString(),
             inline: true,
           },
           {
-            name: "Data do último commit",
+            name: "Last commit date",
             value: lastCommitDate,
             inline: true,
           },
           {
-            name: "Data de criação da conta",
+            name: "Account creation date",
             value: accountCreationDate,
             inline: true,
           },
           {
-            name: "Link para o perfil do GitHub",
+            name: "GitHub profile url",
             value: response.data.html_url,
             inline: true,
           }
@@ -136,7 +136,7 @@ new Command({
 
       await interaction.reply({ embeds: [githubEmbed] });
     } catch (error) {
-      await interaction.reply("Erro: Usuário não encontrado");
+      await interaction.reply("Error: User not found.");
     }
   },
 });

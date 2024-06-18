@@ -11,20 +11,20 @@ import dotenv from "dotenv";
 dotenv.config();
 
 new Command({
-  name: "tradutor",
-  description: "Traduz o texto que você inserir para a língua desejada.",
+  name: "translate",
+  description: "Translate the text to the desired language",
   type: ApplicationCommandType.ChatInput,
   options: [
     {
-      name: "texto",
+      name: "text",
       type: ApplicationCommandOptionType.String,
-      description: "Texto que deseja traduzir",
+      description: "The text to translate",
       required: true,
     },
     {
-      name: "lingua",
+      name: "language",
       type: ApplicationCommandOptionType.String,
-      description: "Para qual língua deseja traduzir?",
+      description: "The language you want to translate to",
       required: true,
     },
   ],
@@ -36,13 +36,13 @@ new Command({
    */
   async run(interaction: ChatInputCommandInteraction): Promise<void> {
     // Get the text and language from the command options
-    const text = interaction.options.getString("texto");
-    const language = interaction.options.getString("lingua")?.toUpperCase();
+    const text = interaction.options.getString("text");
+    const language = interaction.options.getString("language")?.toUpperCase();
 
     // If text or language is missing, reply with an error message and return
     if (!text || !language) {
       await interaction.reply(
-        "Erro: Por favor, forneça o texto e a língua para tradução."
+        "Error: Please provide both the text and the language to make the translation."
       );
       return;
     }
@@ -66,12 +66,13 @@ new Command({
 
       // Create an embed with the original text and the translated text
       const embed = new EmbedBuilder()
-        .setTitle("Gi Tradutor")
+        .setTitle("GiBot Translations")
         .setColor("#0A253E")
+        .setThumbnail("https://cdn-icons-png.flaticon.com/512/281/281759.png")
         .addFields(
-          { name: "Texto original", value: text, inline: false },
+          { name: "Original text", value: text, inline: false },
           {
-            name: `Traduzido para ${language}`,
+            name: `Translated to ${language}`,
             value: translatedText,
             inline: false,
           }
@@ -81,7 +82,7 @@ new Command({
       await interaction.reply({ embeds: [embed] });
     } catch (error) {
       // If there's an error, log it and reply with an error message
-      await interaction.reply("Desculpe, ocorreu um erro ao traduzir o texto.");
+      await interaction.reply("Error: Failed to translate the text.");
     }
   },
 });
