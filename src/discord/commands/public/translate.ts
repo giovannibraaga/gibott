@@ -81,7 +81,6 @@ new Command({
       await interaction.reply({ embeds: [embed] });
     } catch (error) {
       // If there's an error, log it and reply with an error message
-      console.error(error);
       await interaction.reply("Desculpe, ocorreu um erro ao traduzir o texto.");
     }
   },

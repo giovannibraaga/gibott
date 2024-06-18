@@ -39,7 +39,7 @@ new Command({
       const articlesToShow = newsData.articles.slice(-2);
 
       const newsEmbed = new EmbedBuilder()
-        .setTitle(`News for "${search}"`)
+        .setTitle(`Noticias sobre "${search}"`)
         .setColor("#0A253E")
         .setThumbnail(articlesToShow[0].urlToImage);
 
@@ -53,7 +53,6 @@ new Command({
 
       await interaction.reply({ embeds: [newsEmbed] });
     } catch (error) {
-      console.error(error);
       await interaction.reply("Desculpe, houve um erro ao buscar pelas notícias.");
     }
   },
