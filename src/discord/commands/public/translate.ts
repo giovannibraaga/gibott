@@ -34,7 +34,7 @@ new Command({
    * @param {ChatInputCommandInteraction} interaction - The interaction object.
    * @returns {Promise<void>} - A promise that resolves when the command is completed.
    */
-  async run(interaction: ChatInputCommandInteraction) {
+  async run(interaction: ChatInputCommandInteraction): Promise<void> {
     // Get the text and language from the command options
     const text = interaction.options.getString("texto");
     const language = interaction.options.getString("lingua")?.toUpperCase();
