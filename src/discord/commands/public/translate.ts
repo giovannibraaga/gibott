@@ -69,6 +69,10 @@ new Command({
         .setTitle("GiBot Translations")
         .setColor("#0A253E")
         .setThumbnail("https://cdn-icons-png.flaticon.com/512/281/281759.png")
+        .setFooter({
+          text: `Translation Powered by DeepL`,
+        })
+        .setTimestamp()
         .addFields(
           { name: "Original text", value: text, inline: false },
           {

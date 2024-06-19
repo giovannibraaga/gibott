@@ -22,12 +22,20 @@ new Command({
       required: true,
     },
   ],
+  /**
+   * Fetches movie data from OpenMovieDatabase API and replies with an embed.
+   * @param {ChatInputCommandInteraction} interaction - The interaction object.
+   * @returns {Promise<void>} - A promise that resolves when the function completes.
+   */
   async run(interaction: ChatInputCommandInteraction) {
+    // Get movie title and OMDB token from interaction options
     const movieTitle = interaction.options.getString("title");
     const token = process.env.OMDB_TOKEN;
 
+    // Construct URL for API request
     const url = `https://www.omdbapi.com/?apikey=${token}&t=${movieTitle}`;
 
+    // Check if token and movie title are provided
     if (!token) {
       return interaction.reply({
         content: "Error: No token provided. Please, provide a token.",
@@ -43,9 +51,11 @@ new Command({
     }
 
     try {
+      // Fetch movie data from API
       const response = await axios.get(url);
       const movieData = response.data;
 
+      // Check if movie was found
       if (movieData.Response === "False") {
         return interaction.reply({
           content: `Error: Movie not found for title "${movieTitle}".`,
@@ -53,38 +63,44 @@ new Command({
         });
       }
 
+      // Create embed with movie data
       const movieEmbed = new EmbedBuilder()
-        .setTitle(movieData.Title)
-        .setColor("#0A253E")
-        .setThumbnail(movieData.Poster)
+        .setTitle(movieData.Title) // Set title
+        .setColor("#0A253E") // Set color
+        .setThumbnail(movieData.Poster) // Set thumbnail
+        .setFooter({
+          text: "Powered by OpenMovieDatabase",
+        }) // Set footer
+        .setTimestamp() // Set timestamp
         .addFields(
           {
-            name: "plot",
+            name: "plot", // Add plot field
             value: movieData.Plot,
             inline: false,
           },
           {
-            name: "Release Date",
+            name: "Release Date", // Add release date field
             value: movieData.Released,
             inline: true,
           },
           {
-            name: "Popularity",
+            name: "Popularity", // Add popularity field
             value: movieData.imdbRating,
             inline: true,
           },
           {
-            name: "Genre",
+            name: "Genre", // Add genre field
             value: movieData.Genre,
             inline: true,
           },
           {
-            name: "Director",
+            name: "Director", // Add director field
             value: movieData.Director,
             inline: true,
           }
         );
 
+      // Reply with embed
       await interaction.reply({ embeds: [movieEmbed] });
     } catch (error) {
       console.error(error);

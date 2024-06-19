@@ -22,14 +22,24 @@ new Command({
       required: true,
     },
   ],
+  /**
+   * Runs the command when the GitHub command is executed.
+   * Retrieves information about a GitHub user and displays it in an embed.
+   *
+   * @param {ChatInputCommandInteraction} interaction - The interaction object received from Discord.
+   * @returns {Promise<void>} Promise that resolves when the command is executed.
+   */
   async run(interaction: ChatInputCommandInteraction) {
-    const profile = interaction.options.getString("user");
-    const token = process.env.GITHUB_TOKEN;
+    const profile = interaction.options.getString("user"); // Get the GitHub username from the command options.
+    const token = process.env.GITHUB_TOKEN; // Get the GitHub token from the environment variables.
+
+    // Construct the URLs for the GitHub API endpoints.
     const repositoriesUrl = `https://api.github.com/users/${profile}/repos`;
     const commitsUrl = `https://api.github.com/users/${profile}/events`;
     const lastCommitUrl = `https://api.github.com/users/${profile}/events/public`;
     const url = `https://api.github.com/users/${profile}`;
 
+    // Check if the token and profile are provided.
     if (!token) {
       return interaction.reply({
         content: "Error: No token provided. Please, provide a token.",
@@ -45,6 +55,7 @@ new Command({
     }
 
     try {
+      // Retrieve user information from the GitHub API.
       const response = await axios.get(url, {
         headers: {
           Authorization: `token ${token}`,
@@ -85,6 +96,7 @@ new Command({
       ];
       const currentMonth = monthNames[currentDate.getMonth()];
 
+      // Format date strings.
       const accountCreationDate = new Date(
         response.data.created_at
       ).toLocaleDateString("en", {
@@ -102,10 +114,15 @@ new Command({
             })
           : "No commits yet";
 
+      // Create an embed with the user information.
       const githubEmbed = new EmbedBuilder()
         .setTitle(` ${profile}'s GitHub profile`)
         .setColor("#0A253E")
         .setThumbnail(response.data.avatar_url)
+        .setFooter({
+          text: "Powered by GitHub",
+        })
+        .setTimestamp()
         .addFields(
           {
             name: "Total repositories",
@@ -134,6 +151,7 @@ new Command({
           }
         );
 
+      // Send the embed in the chat.
       await interaction.reply({ embeds: [githubEmbed] });
     } catch (error) {
       console.error(error);

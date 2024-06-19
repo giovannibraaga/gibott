@@ -22,6 +22,11 @@ new Command({
       required: true,
     },
   ],
+  /**
+   * Get weather data from OpenWeatherMap API and send a Discord embed with the data.
+   *
+   * @param {ChatInputCommandInteraction} interaction - Discord interaction object
+   */
   async run(interaction: ChatInputCommandInteraction) {
     const location = interaction.options.getString("location");
     const token = process.env.WEATHER_TOKEN;
@@ -43,6 +48,10 @@ new Command({
         .setThumbnail(
           `http://openweathermap.org/img/wn/${weatherData.weather[0].icon}@2x.png`
         )
+        .setFooter({
+          text: "Powered by OpenWeatherMap",
+        })
+        .setTimestamp()
         .addFields(
           {
             name: "Temperature",
