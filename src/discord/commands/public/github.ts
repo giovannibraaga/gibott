@@ -154,7 +154,6 @@ new Command({
       // Send the embed in the chat.
       await interaction.reply({ embeds: [githubEmbed] });
     } catch (error) {
-      console.error(error);
       await interaction.reply("Error: User not found.");
     }
   },

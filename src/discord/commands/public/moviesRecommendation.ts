@@ -111,7 +111,13 @@ new Command({
       })),
     },
   ],
+  /**
+   * Runs the command and recommends movies based on the selected genre.
+   * @param {ChatInputCommandInteraction} interaction - The interaction object.
+   * @returns {Promise<void>} - A promise that resolves when the function completes.
+   */
   async run(interaction: ChatInputCommandInteraction) {
+    // Get the selected genre from the interaction options
     const genre = interaction.options.getString("genre");
 
     // Check if genre is null
@@ -119,30 +125,37 @@ new Command({
       return interaction.reply("You must select a genre.");
     }
 
+    // Get the genre ID from the genreMapping object
     const genreId = genreMapping[genre];
     const token = process.env.TMDB_TOKEN;
 
+    // Check if genre is valid
     if (!genreId) {
       return interaction.reply("Invalid genre selected.");
     }
 
+    // Construct the URL for the API request
     const url = `https://api.themoviedb.org/3/discover/movie?api_key=${token}&with_genres=${genreId}`;
 
     try {
+      // Fetch the movie data from the API
       const [response, genreNames] = await Promise.all([
         fetchWithRetry(url),
         getGenreNames(),
       ]);
       const movieDataRecommendations = response.data;
 
+      // Check if there are movies available for the selected genre
       if (movieDataRecommendations.results.length === 0) {
         return interaction.reply("No movies found for the selected genre.");
       }
 
+      // Sort the movies by rating and get the top 2
       const sortedMovies = movieDataRecommendations.results
         .sort((a: any, b: any) => b.vote_average - a.vote_average)
         .slice(0, 2);
 
+      // Create an embed to display the movie recommendations
       const embedMovieRecommendations = new EmbedBuilder()
         .setColor("#0A253E")
         .setTitle(`${genre} movies recommendations`)
@@ -153,6 +166,7 @@ new Command({
         })
         .setTimestamp();
 
+      // Add fields to the embed for each movie
       sortedMovies.forEach((movie: any) => {
         const title = movie.title || "No title available";
         const genres = movie.genre_ids
@@ -162,7 +176,6 @@ new Command({
         const releaseDate = movie.release_date || "No release date available";
         const plot = movie.overview || "No plot available";
 
-        // Add fields to embed
         embedMovieRecommendations.addFields(
           { name: "Title", value: title, inline: true },
           { name: "Genres", value: genres, inline: true },
@@ -172,9 +185,9 @@ new Command({
         );
       });
 
+      // Reply with the embed
       return interaction.reply({ embeds: [embedMovieRecommendations] });
     } catch (error) {
-      console.log(error);
       return interaction.reply("Error: Something went wrong.");
     }
   },

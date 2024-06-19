@@ -103,7 +103,6 @@ new Command({
       // Reply with embed
       await interaction.reply({ embeds: [movieEmbed] });
     } catch (error) {
-      console.error(error);
       await interaction.reply(
         "Error: Failed to fetch movie data. Please, try again later."
       );
