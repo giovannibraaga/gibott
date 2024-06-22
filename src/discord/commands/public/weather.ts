@@ -12,7 +12,7 @@ dotenv.config();
 
 new Command({
   name: "weather",
-  description: "Mostra o clima da localização especificada.",
+  description: "Get weather information.",
   type: ApplicationCommandType.ChatInput,
   options: [
     {

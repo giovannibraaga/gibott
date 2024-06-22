@@ -10,7 +10,14 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+
+/**
+ * Represents a mapping of genre names to their corresponding genre IDs.
+ */
 type GenreMapping = {
+  /**
+   * The genre name.
+   */
   [key: string]: number;
 };
 
@@ -36,10 +43,6 @@ const genreMapping: GenreMapping = {
   Western: 37,
 };
 
-const axiosInstance = axios.create({
-  timeout: 10000, // Set timeout to 10 seconds
-});
-
 /**
  * Fetches data from a URL using Axios with a configurable number of retries.
  *
@@ -53,7 +56,7 @@ async function fetchWithRetry(url: string, retries: number = 3): Promise<any> {
   for (let i = 0; i < retries; i++) {
     try {
       // Attempt to fetch data from the URL
-      return await axiosInstance.get(url);
+      return await axios.get(url);
     } catch (error) {
       // If this is the last retry, throw the error
       if (i === retries - 1) {

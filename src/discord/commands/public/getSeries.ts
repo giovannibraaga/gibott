@@ -12,7 +12,7 @@ dotenv.config();
 
 new Command({
   name: "find-series",
-  description: "Get information about a series",
+  description: "Fetch series information",
   type: ApplicationCommandType.ChatInput,
   options: [
     {

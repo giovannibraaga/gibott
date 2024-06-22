@@ -12,7 +12,7 @@ dotenv.config();
 
 new Command({
   name: "get-movies",
-  description: "Get information about a movie",
+  description: "Fetch movies information",
   type: ApplicationCommandType.ChatInput,
   options: [
     {
