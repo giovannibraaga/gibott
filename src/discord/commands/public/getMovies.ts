@@ -27,28 +27,30 @@ new Command({
    * @param {ChatInputCommandInteraction} interaction - The interaction object.
    * @returns {Promise<void>} - A promise that resolves when the function completes.
    */
-  async run(interaction: ChatInputCommandInteraction) {
+  async run(interaction: ChatInputCommandInteraction): Promise<void> {
     // Get movie title and OMDB token from interaction options
     const movieTitle = interaction.options.getString("title");
     const token = process.env.OMDB_TOKEN;
 
-    // Construct URL for API request
-    const url = `https://www.omdbapi.com/?apikey=${token}&t=${movieTitle}`;
-
     // Check if token and movie title are provided
     if (!token) {
-      return interaction.reply({
+      await interaction.reply({
         content: "Error: No token provided. Please, provide a token.",
         ephemeral: true,
       });
+      return;
     }
 
     if (!movieTitle) {
-      return interaction.reply({
+      await interaction.reply({
         content: "Error: No title provided. Please, provide a title.",
         ephemeral: true,
       });
+      return;
     }
+
+    // Construct URL for API request
+    const url = `https://www.omdbapi.com/?apikey=${token}&t=${movieTitle}`;
 
     try {
       // Fetch movie data from API
@@ -57,10 +59,11 @@ new Command({
 
       // Check if movie was found
       if (movieData.Response === "False") {
-        return interaction.reply({
+        await interaction.reply({
           content: `Error: Movie not found for title "${movieTitle}".`,
           ephemeral: true,
         });
+        return;
       }
 
       // Create embed with movie data
@@ -74,28 +77,28 @@ new Command({
         .setTimestamp() // Set timestamp
         .addFields(
           {
-            name: "plot", // Add plot field
-            value: movieData.Plot,
+            name: "Plot", // Add plot field
+            value: movieData.Plot || "No plot available",
             inline: false,
           },
           {
             name: "Release Date", // Add release date field
-            value: movieData.Released,
+            value: movieData.Released || "No release date available",
             inline: true,
           },
           {
             name: "Popularity", // Add popularity field
-            value: movieData.imdbRating,
+            value: movieData.imdbRating || "N/A",
             inline: true,
           },
           {
             name: "Genre", // Add genre field
-            value: movieData.Genre,
+            value: movieData.Genre || "No genre available",
             inline: true,
           },
           {
             name: "Director", // Add director field
-            value: movieData.Director,
+            value: movieData.Director || "No director available",
             inline: true,
           }
         );
@@ -103,9 +106,11 @@ new Command({
       // Reply with embed
       await interaction.reply({ embeds: [movieEmbed] });
     } catch (error) {
-      await interaction.reply(
-        "Error: Failed to fetch movie data. Please, try again later."
-      );
+      console.error(error);
+      await interaction.reply({
+        content: "Error: Failed to fetch movie data. Please, try again later.",
+        ephemeral: true,
+      });
     }
   },
 });

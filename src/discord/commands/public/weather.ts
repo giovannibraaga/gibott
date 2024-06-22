@@ -27,7 +27,7 @@ new Command({
    *
    * @param {ChatInputCommandInteraction} interaction - Discord interaction object
    */
-  async run(interaction: ChatInputCommandInteraction) {
+  async run(interaction: ChatInputCommandInteraction): Promise<void> {
     const location = interaction.options.getString("location");
     const token = process.env.WEATHER_TOKEN;
 
@@ -38,7 +38,7 @@ new Command({
       const weatherData = response.data;
 
       if (weatherData.cod !== 200) {
-        return interaction.reply(`Error: ${weatherData.message}`);
+        await interaction.reply(`Error: ${weatherData.message}`);
       }
 
       const weatherEmbed = new EmbedBuilder()

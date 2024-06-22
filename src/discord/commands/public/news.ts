@@ -28,7 +28,7 @@ new Command({
    * @param {ChatInputCommandInteraction} interaction - The interaction object.
    * @returns {Promise<void>} - A promise that resolves when the command is executed.
    */
-  async run(interaction: ChatInputCommandInteraction) {
+  async run(interaction: ChatInputCommandInteraction): Promise<void> {
     // Get the search query from the interaction options
     const search = interaction.options.getString("search");
     // Get the news API token from the environment variables
@@ -44,7 +44,7 @@ new Command({
 
       // If no articles are found, reply with an error message
       if (!newsData.articles || newsData.articles.length === 0) {
-        return interaction.reply("Error: No articles found.");
+        await interaction.reply("Error: No articles found.");
       }
 
       // Get the two most recent articles to show

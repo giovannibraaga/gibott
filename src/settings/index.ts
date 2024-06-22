@@ -3,7 +3,6 @@ import { envSchema, type EnvSchema } from "./env.js";
 import { brBuilder } from "@magicyan/discord";
 import { consola as log } from "consola";
 export { onError } from "./error.js";
-import axios from 'axios'
 import chalk from "chalk";
 
 import "./global.js";

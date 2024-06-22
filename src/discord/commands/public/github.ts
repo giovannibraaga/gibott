@@ -29,9 +29,12 @@ new Command({
    * @param {ChatInputCommandInteraction} interaction - The interaction object received from Discord.
    * @returns {Promise<void>} Promise that resolves when the command is executed.
    */
-  async run(interaction: ChatInputCommandInteraction) {
-    const profile = interaction.options.getString("user"); // Get the GitHub username from the command options.
-    const token = process.env.GITHUB_TOKEN; // Get the GitHub token from the environment variables.
+  async run(interaction: ChatInputCommandInteraction): Promise<void> {
+    // Get the GitHub username from the command options.
+    const profile = interaction.options.getString("user");
+
+    // Get the GitHub token from the environment variables.
+    const token = process.env.GITHUB_TOKEN;
 
     // Construct the URLs for the GitHub API endpoints.
     const repositoriesUrl = `https://api.github.com/users/${profile}/repos`;
@@ -41,41 +44,45 @@ new Command({
 
     // Check if the token and profile are provided.
     if (!token) {
-      return interaction.reply({
+      await interaction.reply({
         content: "Error: No token provided. Please, provide a token.",
         ephemeral: true,
       });
+      return;
     }
 
     if (!profile) {
-      return interaction.reply({
+      await interaction.reply({
         content: "Error: No username provided. Please, provide an username.",
         ephemeral: true,
       });
+      return;
     }
 
     try {
       // Retrieve user information from the GitHub API.
-      const response = await axios.get(url, {
-        headers: {
-          Authorization: `token ${token}`,
-        },
-      });
-      const repositories = await axios.get(repositoriesUrl, {
-        headers: {
-          Authorization: `token ${token}`,
-        },
-      });
-      const commits = await axios.get(commitsUrl, {
-        headers: {
-          Authorization: `token ${token}`,
-        },
-      });
-      const lastCommit = await axios.get(lastCommitUrl, {
-        headers: {
-          Authorization: `token ${token}`,
-        },
-      });
+      const [response, repositories, commits, lastCommit] = await Promise.all([
+        axios.get(url, {
+          headers: {
+            Authorization: `token ${token}`,
+          },
+        }),
+        axios.get(repositoriesUrl, {
+          headers: {
+            Authorization: `token ${token}`,
+          },
+        }),
+        axios.get(commitsUrl, {
+          headers: {
+            Authorization: `token ${token}`,
+          },
+        }),
+        axios.get(lastCommitUrl, {
+          headers: {
+            Authorization: `token ${token}`,
+          },
+        }),
+      ]);
 
       const lastCommitData = lastCommit.data;
 

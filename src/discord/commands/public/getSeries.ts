@@ -27,7 +27,7 @@ new Command({
    * @param {ChatInputCommandInteraction} interaction - The interaction object.
    * @returns {Promise<void>} - A promise that resolves when the function completes.
    */
-  async run(interaction: ChatInputCommandInteraction) {
+  async run(interaction: ChatInputCommandInteraction): Promise<void> {
     // Get series title and OMDB token from interaction options
     const seriesTitle = interaction.options.getString("title");
     const token = process.env.OMDB_TOKEN;
@@ -37,14 +37,14 @@ new Command({
 
     // Check if token and series title are provided
     if (!token) {
-      return interaction.reply({
+      await interaction.reply({
         content: "Error: No token provided. Please, provide a token.",
         ephemeral: true,
       });
     }
 
     if (!seriesTitle) {
-      return interaction.reply({
+      await interaction.reply({
         content: "Error: No title provided. Please, provide a title.",
         ephemeral: true,
       });
@@ -57,7 +57,7 @@ new Command({
 
       // Check if series was found
       if (seriesData.Response === "False") {
-        return interaction.reply({
+        await interaction.reply({
           content: `Error: Series not found for title "${seriesTitle}".`,
           ephemeral: true,
         });

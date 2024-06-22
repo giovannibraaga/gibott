@@ -10,14 +10,10 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-
 /**
  * Represents a mapping of genre names to their corresponding genre IDs.
  */
 type GenreMapping = {
-  /**
-   * The genre name.
-   */
   [key: string]: number;
 };
 
@@ -52,17 +48,13 @@ const genreMapping: GenreMapping = {
  * @throws {Error} If all retries fail.
  */
 async function fetchWithRetry(url: string, retries: number = 3): Promise<any> {
-  // Iterate over the specified number of retries
   for (let i = 0; i < retries; i++) {
     try {
-      // Attempt to fetch data from the URL
       return await axios.get(url);
     } catch (error) {
-      // If this is the last retry, throw the error
       if (i === retries - 1) {
         throw error;
       }
-      // Log the failure and continue to the next retry
       console.log(`Retry ${i + 1}/${retries} failed: `, error);
     }
   }
@@ -76,31 +68,19 @@ async function fetchWithRetry(url: string, retries: number = 3): Promise<any> {
  * @throws {Error} If the API request fails after the specified number of retries.
  */
 async function getGenreNames(): Promise<{ [key: number]: string }> {
-  // Construct the URL for the API request
   const url = `https://api.themoviedb.org/3/genre/movie/list?api_key=${process.env.TMDB_TOKEN}`;
-
-  // Fetch the response from the API
   const response = await fetchWithRetry(url);
-
-  // Extract the genres from the response
   const genres = response.data.genres;
-
-  // Create a map to store the genre names
   const genreMap: { [key: number]: string } = {};
-
-  // Populate the genre map with the genre IDs and names
   genres.forEach((genre: { id: number; name: string }) => {
     genreMap[genre.id] = genre.name;
   });
-
-  // Return the genre map
   return genreMap;
 }
 
 new Command({
   name: "movies-recommendations",
-  description:
-    "Irá recomendar filmes para você assistir baseado no genêro que for escolhido.",
+  description: "Irá recomendar filmes para você assistir baseado no genêro que for escolhido.",
   type: ApplicationCommandType.ChatInput,
   options: [
     {
@@ -119,29 +99,27 @@ new Command({
    * @param {ChatInputCommandInteraction} interaction - The interaction object.
    * @returns {Promise<void>} - A promise that resolves when the function completes.
    */
-  async run(interaction: ChatInputCommandInteraction) {
-    // Get the selected genre from the interaction options
+  async run(interaction: ChatInputCommandInteraction): Promise<void> {
     const genre = interaction.options.getString("genre");
 
     // Check if genre is null
     if (!genre) {
-      return interaction.reply("You must select a genre.");
+      await interaction.reply("You must select a genre.");
+      return;
     }
 
-    // Get the genre ID from the genreMapping object
     const genreId = genreMapping[genre];
     const token = process.env.TMDB_TOKEN;
 
     // Check if genre is valid
     if (!genreId) {
-      return interaction.reply("Invalid genre selected.");
+      await interaction.reply("Invalid genre selected.");
+      return;
     }
 
-    // Construct the URL for the API request
     const url = `https://api.themoviedb.org/3/discover/movie?api_key=${token}&with_genres=${genreId}`;
 
     try {
-      // Fetch the movie data from the API
       const [response, genreNames] = await Promise.all([
         fetchWithRetry(url),
         getGenreNames(),
@@ -150,7 +128,8 @@ new Command({
 
       // Check if there are movies available for the selected genre
       if (movieDataRecommendations.results.length === 0) {
-        return interaction.reply("No movies found for the selected genre.");
+        await interaction.reply("No movies found for the selected genre.");
+        return;
       }
 
       // Sort the movies by rating and get the top 2
@@ -189,9 +168,10 @@ new Command({
       });
 
       // Reply with the embed
-      return interaction.reply({ embeds: [embedMovieRecommendations] });
+      await interaction.reply({ embeds: [embedMovieRecommendations] });
     } catch (error) {
-      return interaction.reply("Error: Something went wrong.");
+      console.error(error);
+      await interaction.reply("Error: Something went wrong.");
     }
   },
 });
